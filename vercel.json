@@ -1,5 +1,8 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "https://finance-g72p.onrender.com/api/$1" }
-  ]
+  ],
+  "env": {
+    "VITE_API_URL": "https://finance-g72p.onrender.com"
+  }
 }
