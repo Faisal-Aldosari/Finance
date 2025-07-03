@@ -9,17 +9,24 @@ import BudgetInput from './pages/BudgetInput';
 import CashInInput from './pages/CashInInput';
 import ReportPage from './pages/ReportPage';
 import DashboardBuilder from './pages/DashboardBuilder';
+import VerifyEmail from './pages/VerifyEmail';
 import { FinanceDataProvider } from './context/FinanceDataContext';
 import './App.css';
 
 function Dashboard() {
   const [user, setUser] = useState<{ username: string } | null>(null);
-  const [authOpen] = useState(true);
+  const [authOpen, setAuthOpen] = useState(!user);
+  
+  const handleAuth = (user: { username: string }) => {
+    setUser(user);
+    setAuthOpen(false);
+  };
+  
   return (
     <>
-      <AuthPopup open={authOpen} onAuth={setUser} />
+      <AuthPopup open={authOpen} onAuth={handleAuth} />
       <Typography variant="h3" align="center" gutterBottom>
-        Youssef BI
+        YoussefBI
       </Typography>
       {user && <Typography variant="subtitle1" align="center">Welcome, {user?.username}</Typography>}
       <DashboardBuilder />
@@ -41,6 +48,7 @@ function App() {
               <Route path="/budget" element={<BudgetInput />} />
               <Route path="/cash" element={<CashInInput />} />
               <Route path="/reports" element={<ReportPage />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
             </Routes>
           </Box>
           <Box component="footer" sx={{ textAlign: 'center', py: 2, mt: 4, bgcolor: '#f5f5f5', borderRadius: 1 }}>

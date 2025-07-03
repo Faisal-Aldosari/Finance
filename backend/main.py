@@ -1,13 +1,15 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional, Union
 from fastapi.responses import FileResponse, JSONResponse
 import tempfile
 from fpdf import FPDF
 import pandas as pd
 from fastapi_users import FastAPIUsers, models as fa_models, schemas as fa_schemas
 from fastapi_users.authentication import JWTStrategy, AuthenticationBackend, CookieTransport
+from httpx_oauth.clients.google import GoogleOAuth2
+from httpx_oauth.clients.microsoft import MicrosoftGraphOAuth2
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy import create_engine, Column, String, Boolean
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
@@ -15,20 +17,39 @@ from sqlalchemy.orm import sessionmaker
 from fastapi import Depends, Request
 import uuid
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 import smtplib
 from email.message import EmailMessage
+import asyncio
 
 app = FastAPI()
+
+# Load environment variables
+load_dotenv()
+
+# Get frontend URLs for CORS
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+PRODUCTION_FRONTEND_URL = os.getenv("PRODUCTION_FRONTEND_URL", "https://your-frontend-url.com")
 
 # Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[FRONTEND_URL, PRODUCTION_FRONTEND_URL, "http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Root endpoint
+@app.get("/")
+async def root():
+    return {"message": "YoussefBI Finance API", "status": "running"}
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": str(datetime.now())}
 
 # In-memory storage for demo
 DEPARTMENTS: Dict[str, dict] = {}
@@ -56,17 +77,18 @@ class Session(BaseModel):
 class CashTransaction(BaseModel):
     id: str
     type: str  # 'in' or 'out'
-    amount: float
-    description: str = ""
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the YoussefBI API!"}
+# Database setup
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+SECRET = os.getenv("SECRET", "SECRET")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "youssefbisystem@gmail.com")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "oqjo rvwg gzlz ztnh")
 
 # Database setup
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 SECRET = os.getenv("SECRET", "SECRET")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "youssefbisystem@gmail.com")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "oqjo rvwg gzlz ztnh")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -84,17 +106,20 @@ class User(Base):
 Base.metadata.create_all(bind=engine)
 
 class UserRead(fa_schemas.BaseUser[str]):
-    username: str | None
+    username: Optional[str]
 
 class UserCreate(fa_schemas.BaseUserCreate):
-    username: str | None
+    username: Optional[str]
 
 class UserUpdate(fa_schemas.BaseUserUpdate):
-    username: str | None
+    username: Optional[str]
 
-def get_user_db():
+async def get_user_db():
     db = SessionLocal()
-    yield SQLAlchemyUserDatabase(db, User)
+    try:
+        yield SQLAlchemyUserDatabase(db, User)
+    finally:
+        db.close()
 
 cookie_transport = CookieTransport(cookie_name="auth", cookie_max_age=3600)
 
@@ -254,11 +279,48 @@ def export_cash_summary_pdf(user=Depends(fastapi_users.current_user())):
     pdf.add_page()
     pdf.set_font("Arial", size=16)
     pdf.cell(200, 10, txt="Financial Summary", ln=True)
-    for k, v in summary.items():
-        pdf.cell(200, 10, txt=f"{k.replace('_', ' ').title()}: {v}", ln=True)
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-        pdf.output(tmp.name)
-        return FileResponse(tmp.name, filename="summary.pdf", media_type="application/pdf")
+@app.post("/auth/register")
+async def register_user(data: dict, background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
+    """Custom registration endpoint that creates user and sends verification email"""
+    email = data.get('email')
+    username = data.get('username')
+    password = data.get('password')
+    
+    if not email or not username or not password:
+        raise HTTPException(status_code=400, detail="Missing required fields")
+    
+    # Check if user already exists
+    existing_user = await user_db.get_by_email(email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    # Create user
+    user_create = UserCreate(email=email, username=username, password=password)
+    try:
+        user = await user_db.create(user_create)
+        
+        # Send verification email
+        token = str(uuid.uuid4())
+        VERIFIED_USERS.add(token)
+        
+        def send_email():
+            msg = EmailMessage()
+            msg['Subject'] = 'Verify your email for YoussefBI'
+            msg['From'] = EMAIL_ADDRESS
+            msg['To'] = email
+            msg.set_content(f'Welcome to YoussefBI! Click to verify your email: {FRONTEND_URL}/verify-email?token={token}')
+            try:
+                with smtplib.SMTP('smtp.gmail.com', 587) as s:
+                    s.starttls()
+                    s.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                    s.send_message(msg)
+            except Exception as e:
+                print('Email send failed:', e)
+        
+        background_tasks.add_task(send_email)
+        return {"detail": "Registration successful. Verification email sent."}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/auth/request-verify")
 def request_verify(data: dict, background_tasks: BackgroundTasks):
@@ -267,19 +329,18 @@ def request_verify(data: dict, background_tasks: BackgroundTasks):
     password = data.get('password')
     if not email or not username or not password:
         raise HTTPException(status_code=400, detail="Missing fields")
-    # Simulate user creation and send email
     token = str(uuid.uuid4())
-    # Store token for demo (in production, use DB)
     VERIFIED_USERS.add(token)
-    # Send email (replace with real SMTP config)
     def send_email():
         msg = EmailMessage()
         msg['Subject'] = 'Verify your email'
-        msg['From'] = 'noreply@youssefbi.com'
+        msg['From'] = EMAIL_ADDRESS
         msg['To'] = email
-        msg.set_content(f'Click to verify: http://localhost:5173/auth/verify?token={token}')
+        msg.set_content(f'Click to verify: {FRONTEND_URL}/verify-email?token={token}')
         try:
-            with smtplib.SMTP('localhost') as s:
+            with smtplib.SMTP('smtp.gmail.com', 587) as s:
+                s.starttls()
+                s.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
                 s.send_message(msg)
         except Exception as e:
             print('Email send failed:', e)
@@ -292,3 +353,36 @@ def verify_email(token: str):
         VERIFIED_USERS.remove(token)
         return {"detail": "Email verified."}
     raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+# OAuth2 setup
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+MICROSOFT_CLIENT_ID = os.getenv("MICROSOFT_CLIENT_ID", "")
+MICROSOFT_CLIENT_SECRET = os.getenv("MICROSOFT_CLIENT_SECRET", "")
+
+# Use your deployed backend URL for production
+BACKEND_URL = os.getenv("BACKEND_URL", "https://finance-g72p.onrender.com")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", f"{BACKEND_URL}/auth/google/callback")
+MICROSOFT_REDIRECT_URI = os.getenv("MICROSOFT_REDIRECT_URI", f"{BACKEND_URL}/auth/microsoft/callback")
+
+google_oauth = GoogleOAuth2(
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET
+)
+microsoft_oauth = MicrosoftGraphOAuth2(
+    client_id=MICROSOFT_CLIENT_ID,
+    client_secret=MICROSOFT_CLIENT_SECRET
+)
+
+app.include_router(
+    fastapi_users.get_oauth_router(google_oauth, jwt_backend, UserRead),
+    prefix="/auth/google",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_oauth_router(microsoft_oauth, jwt_backend, UserRead),
+    prefix="/auth/microsoft",
+    tags=["auth"],
+)
