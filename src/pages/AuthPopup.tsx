@@ -14,8 +14,6 @@ export default function AuthPopup({ open, onAuth }: AuthPopupProps) {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState('');
 
   // Check for OAuth callback
   useEffect(() => {
@@ -105,44 +103,35 @@ export default function AuthPopup({ open, onAuth }: AuthPopupProps) {
     <Dialog open={open} onClose={undefined} disableEscapeKeyDown>
       <DialogTitle>Sign In / Register</DialogTitle>
       <DialogContent>
-        {verificationSent ? (
+        <Tabs value={tab} onChange={handleTab} sx={{ mb: 2 }}>
+          <Tab label="Email" />
+          <Tab label="Social" />
+        </Tabs>
+        {tab === 0 && (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
-            <Typography>A verification email has been sent to {pendingEmail}. Please verify your email to continue.</Typography>
-            <Button variant="contained" onClick={() => window.location.reload()}>Reload</Button>
+            <TextField 
+              label="Email or Username" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)}
+              helperText="You can use your email or username to login"
+            />
+            <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+            <TextField 
+              label="Username (for registration)" 
+              value={username} 
+              onChange={e => setUsername(e.target.value)}
+              helperText="Only required for registration"
+            />
+            {error && <Typography color="error">{error}</Typography>}
+            <Button variant="contained" onClick={() => handleEmailAuth('login')}>Login</Button>
+            <Button variant="outlined" onClick={() => handleEmailAuth('register')}>Register</Button>
           </Box>
-        ) : (
-          <>
-            <Tabs value={tab} onChange={handleTab} sx={{ mb: 2 }}>
-              <Tab label="Email" />
-              <Tab label="Social" />
-            </Tabs>
-            {tab === 0 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
-                <TextField 
-                  label="Email or Username" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)}
-                  helperText="You can use your email or username to login"
-                />
-                <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                <TextField 
-                  label="Username (for registration)" 
-                  value={username} 
-                  onChange={e => setUsername(e.target.value)}
-                  helperText="Only required for registration"
-                />
-                {error && <Typography color="error">{error}</Typography>}
-                <Button variant="contained" onClick={() => handleEmailAuth('login')}>Login</Button>
-                <Button variant="outlined" onClick={() => handleEmailAuth('register')}>Register</Button>
-              </Box>
-            )}
-            {tab === 1 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
-                <Button variant="contained" startIcon={<GoogleIcon />} onClick={() => handleSocial('google')}>Sign in with Google</Button>
-                <Button variant="contained" startIcon={<MicrosoftIcon />} onClick={() => handleSocial('microsoft')}>Sign in with Microsoft</Button>
-              </Box>
-            )}
-          </>
+        )}
+        {tab === 1 && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
+            <Button variant="contained" startIcon={<GoogleIcon />} onClick={() => handleSocial('google')}>Sign in with Google</Button>
+            <Button variant="contained" startIcon={<MicrosoftIcon />} onClick={() => handleSocial('microsoft')}>Sign in with Microsoft</Button>
+          </Box>
         )}
       </DialogContent>
     </Dialog>

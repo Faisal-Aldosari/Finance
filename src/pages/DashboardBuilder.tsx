@@ -74,25 +74,26 @@ function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
 }
 
 export default function DashboardBuilder() {
-  const { summary } = useFinanceData();
+  const { getAnalytics } = useFinanceData();
+  const summary = getAnalytics([]);
   const [visuals, setVisuals] = useState<{
     id: number;
     type: 'bar' | 'pie' | 'table';
     data: { name: string; value: number }[];
   }[]>([
     { id: 1, type: 'bar', data: [
-      { name: 'Profit', value: summary.profit },
       { name: 'Net Profit', value: summary.netProfit },
+      { name: 'Total Income', value: summary.totalIncome },
       { name: 'Gross Margin', value: summary.grossMargin },
     ] },
     { id: 2, type: 'pie', data: [
-      { name: 'Profit', value: summary.profit },
       { name: 'Net Profit', value: summary.netProfit },
+      { name: 'Total Income', value: summary.totalIncome },
       { name: 'Gross Margin', value: summary.grossMargin },
     ] },
     { id: 3, type: 'table', data: [
-      { name: 'Profit', value: summary.profit },
       { name: 'Net Profit', value: summary.netProfit },
+      { name: 'Total Income', value: summary.totalIncome },
       { name: 'Gross Margin', value: summary.grossMargin },
     ] },
   ]);
@@ -104,8 +105,8 @@ export default function DashboardBuilder() {
   // Update visuals when summary changes
   useEffect(() => {
     setVisuals(visuals => visuals.map(v => ({ ...v, data: [
-      { name: 'Profit', value: summary.profit },
       { name: 'Net Profit', value: summary.netProfit },
+      { name: 'Total Income', value: summary.totalIncome },
       { name: 'Gross Margin', value: summary.grossMargin },
     ] })));
   }, [summary]);
@@ -114,8 +115,8 @@ export default function DashboardBuilder() {
     <Box>
       <Typography variant="h4" gutterBottom>Dashboard</Typography>
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={4}><Paper sx={{ p: 2, bgcolor: '#e3f2fd' }}>Profit: {summary.profit}</Paper></Grid>
-        <Grid item xs={4}><Paper sx={{ p: 2, bgcolor: '#f3e5f5' }}>Net Profit: {summary.netProfit}</Paper></Grid>
+        <Grid item xs={4}><Paper sx={{ p: 2, bgcolor: '#e3f2fd' }}>Net Profit: {summary.netProfit}</Paper></Grid>
+        <Grid item xs={4}><Paper sx={{ p: 2, bgcolor: '#f3e5f5' }}>Total Income: {summary.totalIncome}</Paper></Grid>
         <Grid item xs={4}><Paper sx={{ p: 2, bgcolor: '#fffde7' }}>Gross Margin: {summary.grossMargin}</Paper></Grid>
       </Grid>
       {visuals.map(v => (

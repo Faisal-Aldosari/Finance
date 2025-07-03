@@ -1,0 +1,613 @@
+/* Finance Dashboard Styles - Based on AbilityFinance.html */
+
+.finance-dashboard {
+  background: #fff;
+  color: #2E2C6E;
+  font-family: 'Poppins', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 16px 64px 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h1 {
+  color: #2E2C6E;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Period Bar */
+.period-bar, .budget-bar {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.period-bar label, .budget-bar label {
+  color: #2E2C6E;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.period-bar select, .period-bar input,
+.budget-bar select, .budget-bar input {
+  background: #F89841;
+  color: #2E2C6E;
+  border: 1px solid #2E2C6E;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1em;
+  margin-right: 8px;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.period-bar .btn, .budget-bar .btn {
+  padding: 6px 18px;
+  font-size: 1em;
+  margin-left: 8px;
+  background: #2E2C6E;
+  color: #F89841;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Form Section */
+.form-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 36px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+.form-section label {
+  color: #2E2C6E;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-section input[type="number"], .form-section input[type="month"] {
+  background: #F89841;
+  color: #2E2C6E;
+  border: 1px solid #2E2C6E;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 12px;
+  font-family: 'Poppins', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.form-section .category-group {
+  margin-bottom: 18px;
+}
+
+.form-section .category-title {
+  font-weight: 600;
+  color: #2E2C6E;
+  margin-bottom: 8px;
+  margin-top: 16px;
+  font-size: 1.1em;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  background: #2E2C6E;
+  color: #F89841;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.btn:hover {
+  background: #1F1A4A;
+}
+
+.btn.selected {
+  background: #2E2C6E;
+  color: #fff;
+}
+
+.btn.danger {
+  background: #ff7f7f;
+  color: #2E2C6E;
+  border: none;
+}
+
+.btn.danger:hover {
+  background: #F44336;
+  color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section */
+.section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 36px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+.section h2 {
+  color: #2E2C6E;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* Budget Section */
+.budget-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 24px 8px 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.budget-section h2 {
+  color: #2E2C6E;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.budget-card {
+  background: #F89841;
+  border-radius: 10px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 220px;
+}
+
+.budget-card label {
+  margin-top: 8px;
+  color: #2E2C6E;
+  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.budget-card input[type="number"] {
+  width: 100%;
+  font-size: 1.1em;
+  text-align: center;
+  margin-top: 6px;
+  background: #fff;
+  color: #2E2C6E;
+  border: 1px solid #2E2C6E;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: 'Poppins', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.budget-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  gap: 16px;
+  align-items: center;
+}
+
+.budget-actions .btn {
+  font-size: 1.1em;
+  padding: 10px 32px;
+}
+
+.budget-error {
+  color: #ff7f7f;
+  align-self: center;
+}
+
+/* Custom Service Rows */
+.custom-service-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.custom-service-row input[type="text"] {
+  width: 120px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #2E2C6E;
+  background: #fff;
+  color: #2E2C6E;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.custom-service-row input[type="number"] {
+  width: 80px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #2E2C6E;
+  background: #fff;
+  color: #2E2C6E;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.custom-service-row button {
+  background: #ff7f7f;
+  color: #2E2C6E;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.custom-service-row button:hover {
+  background: #F44336;
+  color: #fff;
+}
+
+.budget-card .custom-service-row {
+  margin-bottom: 4px;
+}
+
+.budget-card .btn {
+  margin: 6px 0 0 0;
+  padding: 4px 10px;
+  font-size: 0.95em;
+}
+
+/* Bank Section */
+.bank-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 36px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+.bank-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.bank-row label {
+  font-weight: 500;
+  color: #2E2C6E;
+  margin-right: 4px;
+}
+
+.bank-row input[type="number"] {
+  width: 120px;
+  background: #F89841;
+  color: #2E2C6E;
+  border: 1px solid #2E2C6E;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 16px;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.bank-summary {
+  font-weight: 600;
+  color: #2E2C6E;
+  margin-top: 8px;
+  font-size: 1.1em;
+}
+
+/* Cards */
+.card-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  box-sizing: border-box;
+  max-width: 100vw;
+}
+
+.card {
+  background: #F89841;
+  border-radius: 10px;
+  padding: 24px 32px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  color: #2E2C6E;
+  font-size: 15px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 2em;
+  font-weight: 700;
+  color: #2E2C6E;
+}
+
+.card-value.negative {
+  color: #ff7f7f;
+}
+
+/* Tables */
+.table-container {
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+table {
+  width: 100%;
+  min-width: 900px;
+  box-sizing: border-box;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  text-align: right;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  text-align: center;
+  border-bottom: 1px solid #2E2C6E;
+  background: #F89841;
+  color: #2E2C6E;
+  font-weight: 600;
+}
+
+td {
+  background: #F89841;
+  color: #2E2C6E;
+}
+
+tr.selected {
+  background: #fff !important;
+}
+
+tr:hover {
+  background: #fff;
+  cursor: pointer;
+}
+
+.summary-table th, .summary-table td {
+  text-align: center;
+}
+
+.summary-table .negative {
+  color: #ff7f7f;
+}
+
+.summary-table .positive {
+  color: #2E2C6E;
+}
+
+.expand-row {
+  background: #fff !important;
+}
+
+.expand-row td {
+  color: #2E2C6E;
+  font-size: 0.98em;
+  background: #fff !important;
+  border-bottom: none;
+  text-align: left;
+  padding-left: 40px;
+}
+
+.expand-row .negative {
+  color: #ff7f7f;
+}
+
+.expand-row .positive {
+  color: #2E2C6E;
+}
+
+.expand-btn {
+  background: #2E2C6E;
+  color: #F89841;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.expand-btn:hover {
+  background: #1F1A4A;
+}
+
+/* Error Messages */
+.form-error {
+  color: #ff7f7f;
+  margin-left: 16px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  color: #2E2C6E;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 1em;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .card-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .budget-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .period-bar, .budget-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .container {
+    padding: 16px 2vw 32px 2vw;
+  }
+  
+  table {
+    min-width: 600px;
+  }
+  
+  .section, .budget-section {
+    padding: 12px;
+  }
+  
+  .summary-table th, .summary-table td {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.section, .budget-section {
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.summary-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.summary-table thead, .summary-table tbody {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.summary-table th, .summary-table td {
+  word-break: break-word;
+  white-space: normal;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Additional responsive adjustments */
+@media (max-width: 900px) {
+  .summary-table th, .summary-table td {
+    max-width: 80px;
+  }
+}
+
+/* Loading and Error States */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #2E2C6E;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #ff7f7f;
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation for smooth interactions */
+.btn, .card, .budget-card {
+  transition: all 0.2s ease;
+}
+
+.card:hover, .budget-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2E2C6E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1F1A4A;
+}

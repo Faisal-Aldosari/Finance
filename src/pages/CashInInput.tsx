@@ -5,14 +5,42 @@ import { useFinanceData } from '../context/FinanceDataContext';
 export default function CashInInput() {
   const [cash, setCash] = useState('');
   const [desc, setDesc] = useState('');
-  const { cashIns, setCashIns } = useFinanceData();
+  const { state, dispatch } = useFinanceData();
 
   const addCash = () => {
     if (!cash || isNaN(Number(cash))) return;
-    setCashIns([...cashIns, { id: Date.now().toString(), amount: Number(cash), description: desc }]);
+    const newRecord = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().slice(0, 7), // YYYY-MM format
+      income_interest: 0,
+      income_other: 0,
+      expense_cogs: 0,
+      expense_rent: 0,
+      expense_utilities: 0,
+      expense_salaries: 0,
+      expense_marketing: 0,
+      expense_other: 0,
+      assets: 0,
+      liabilities: 0,
+      equity: 0,
+      bank_in: Number(cash),
+      bank_out: 0,
+      customService: {
+        OT: [],
+        SLD: [],
+        PHYSC: [],
+        APA: []
+      }
+    };
+    dispatch({
+      type: 'ADD_RECORD',
+      payload: newRecord
+    });
     setCash('');
     setDesc('');
   };
+
+  const cashRecords = state.records.filter(r => r.bank_in > 0);
 
   return (
     <Box>
@@ -24,7 +52,7 @@ export default function CashInInput() {
       </Paper>
       <Typography variant="h6">Entries</Typography>
       <ul>
-        {cashIns.map((e: any, i: number) => <li key={e.id || i}>{e.description}: {e.amount}</li>)}
+        {cashRecords.map((e, i) => <li key={e.id || i}>{e.date}: {e.bank_in}</li>)}
       </ul>
     </Box>
   );

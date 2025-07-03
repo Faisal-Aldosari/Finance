@@ -10,6 +10,7 @@ import CashInInput from './pages/CashInInput';
 import ReportPage from './pages/ReportPage';
 import DashboardBuilder from './pages/DashboardBuilder';
 import VerifyEmail from './pages/VerifyEmail';
+import FinanceDashboard from './pages/FinanceDashboard';
 import { FinanceDataProvider } from './context/FinanceDataContext';
 import './App.css';
 
@@ -43,6 +44,7 @@ function App() {
           <Box sx={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/finance" element={<FinanceDashboard />} />
               <Route path="/actuals" element={<ActualsInput />} />
               <Route path="/departments" element={<DepartmentInput />} />
               <Route path="/budget" element={<BudgetInput />} />

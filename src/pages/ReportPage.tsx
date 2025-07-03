@@ -7,10 +7,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function ReportPage() {
   const [chartType, setChartType] = useState<'bar' | 'pie' | 'table'>('bar');
-  const { summary } = useFinanceData();
+  const { getAnalytics } = useFinanceData();
+  const summary = getAnalytics([]);
   const data = [
-    { name: 'Profit', value: summary.profit },
     { name: 'Net Profit', value: summary.netProfit },
+    { name: 'Total Income', value: summary.totalIncome },
     { name: 'Gross Margin', value: summary.grossMargin },
   ];
 

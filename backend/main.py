@@ -275,7 +275,7 @@ def export_cash_summary_pdf(user=Depends(fastapi_users.current_user())):
     pdf.set_font("Arial", size=16)
     pdf.cell(200, 10, txt="Financial Summary", ln=True)
 @app.post("/auth/register")
-async def register_user(data: dict, background_tasks: BackgroundTasks, user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
+async def register_user(data: dict, background_tasks: BackgroundTasks):
     """Custom registration endpoint that creates user and sends verification email"""
     email = data.get('email')
     username = data.get('username')
@@ -284,13 +284,18 @@ async def register_user(data: dict, background_tasks: BackgroundTasks, user_db: 
     if not email or not username or not password:
         raise HTTPException(status_code=400, detail="Missing required fields")
     
-    # Check if user already exists
+    # Check if user already exists using direct database query
+    db = SessionLocal()
     try:
-        existing_user = await user_db.get_by_email(email)
+        existing_user = db.query(User).filter(User.email == email).first()
         if existing_user:
-            raise HTTPException(status_code=400, detail="User already exists")
-    except Exception:
-        pass  # User doesn't exist, which is good
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        existing_username = db.query(User).filter(User.username == username).first()
+        if existing_username:
+            raise HTTPException(status_code=400, detail="Username already taken")
+    finally:
+        db.close()
     
     # Create user directly in database
     from passlib.hash import bcrypt

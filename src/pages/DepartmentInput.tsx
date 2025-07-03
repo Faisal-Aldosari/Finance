@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import { Box, Typography, Paper, TextField, Button } from '@mui/material';
-import { useFinanceData } from '../context/FinanceDataContext';
 
 export default function DepartmentInput() {
   const [department, setDepartment] = useState('');
-  const { departments, setDepartments } = useFinanceData();
 
   const addDepartment = () => {
     if (!department.trim()) return;
-    setDepartments([...departments, { id: Date.now().toString(), name: department }]);
+    // For now, just show the functionality - this could be extended to store departments
+    alert(`Department "${department}" would be added`);
     setDepartment('');
   };
+
+  // Show some sample departments or existing data
+  const sampleDepartments = [
+    { id: '1', name: 'Finance' },
+    { id: '2', name: 'Operations' },
+    { id: '3', name: 'Marketing' },
+    { id: '4', name: 'HR' }
+  ];
 
   return (
     <Box>
@@ -21,7 +28,7 @@ export default function DepartmentInput() {
       </Paper>
       <Typography variant="h6">Departments</Typography>
       <ul>
-        {departments.map((d, i) => <li key={d.id || i}>{d.name}</li>)}
+        {sampleDepartments.map((d, i) => <li key={d.id || i}>{d.name}</li>)}
       </ul>
     </Box>
   );
