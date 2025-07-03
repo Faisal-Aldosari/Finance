@@ -29,10 +29,10 @@ httpx-oauth==0.15.1
 idna==3.10
 iniconfig==2.1.0
 makefun==1.16.0
-numpy==1.24.4
+numpy>=1.26.0
 openpyxl==3.1.5
 packaging==25.0
-pandas==2.0.3
+pandas>=2.1.0
 passlib==1.7.4
 pillow==10.4.0
 pluggy==1.5.0
