@@ -1,6 +1,6 @@
-# Power BI Clone
+# YoussefBI
 
-This project is a full-featured Power BI clone web application, featuring:
+This project is a full-featured YoussefBI web application, featuring:
 
 - **Backend**: FastAPI (Python) for APIs, data processing, and user management
 - **Frontend**: Vite + React + TypeScript for a modern, user-friendly dashboard

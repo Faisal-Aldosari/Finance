@@ -61,7 +61,7 @@ class CashTransaction(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Power BI Clone API!"}
+    return {"message": "Welcome to the YoussefBI API!"}
 
 # Database setup
 load_dotenv()
