@@ -51,7 +51,7 @@ function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8">
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
@@ -81,7 +81,7 @@ function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
       )}
       {type === 'map' && (
         <Box sx={{ blockSize: 300, inlineSize: '100%' }}>
-          <MapContainer center={[24.7136, 46.6753]} zoom={5} style={{ blockSize: '100%', inlineSize: '100%' }}>
+          <MapContainer center={[24.7136, 46.6753] as [number, number]} zoom={5} style={{ blockSize: '100%', inlineSize: '100%' }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {data.map((row: any, idx: number) => (
               <Marker key={idx} position={[row.lat, row.lng]}>
@@ -96,14 +96,18 @@ function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
 }
 
 export default function DashboardBuilder() {
-  const [visuals, setVisuals] = useState([
+  const [visuals, setVisuals] = useState<{
+    id: number;
+    type: 'bar' | 'pie' | 'table' | 'map';
+    data: { name: string; value: number; lat?: number; lng?: number }[];
+  }[]>([
     { id: 1, type: 'bar', data: sampleData },
     { id: 2, type: 'pie', data: sampleData },
     { id: 3, type: 'table', data: sampleData },
     { id: 4, type: 'map', data: sampleData },
   ]);
 
-  const handleEdit = (id: number, newType: string) => {
+  const handleEdit = (id: number, newType: 'bar' | 'pie' | 'table' | 'map') => {
     setVisuals(visuals.map(v => v.id === id ? { ...v, type: newType } : v));
   };
 

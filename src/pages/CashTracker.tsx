@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Button, TextField, Grid } from '@mui/material';
+import { Box, Typography, Paper, Button, TextField } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import axios from 'axios';
 
 interface CashTrackerProps {
