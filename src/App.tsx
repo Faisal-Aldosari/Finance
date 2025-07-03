@@ -1,36 +1,57 @@
-import { useState } from 'react'
-import { Container, Typography, Box } from '@mui/material'
-import AdminPage from './pages/AdminPage'
-import DataUploadPage from './pages/DataUploadPage'
-import DashboardBuilder from './pages/DashboardBuilder'
-import AuthPopup from './pages/AuthPopup'
-import CashTracker from './pages/CashTracker'
-import './App.css'
+import { useState } from 'react';
+import { Container, Typography, Box } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './pages/Navigation';
+import AuthPopup from './pages/AuthPopup';
+import ActualsInput from './pages/ActualsInput';
+import DepartmentInput from './pages/DepartmentInput';
+import BudgetInput from './pages/BudgetInput';
+import CashInInput from './pages/CashInInput';
+import ReportPage from './pages/ReportPage';
+import DashboardBuilder from './pages/DashboardBuilder';
+import { FinanceDataProvider } from './context/FinanceDataContext';
+import './App.css';
 
-function App() {
-  const [authOpen, setAuthOpen] = useState(true)
-  const [user, setUser] = useState<{ username: string } | null>(null)
-
+function Dashboard() {
+  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [authOpen] = useState(true);
   return (
-    <Container maxWidth="md" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2 }}>
-      <AuthPopup open={authOpen} onClose={() => setAuthOpen(false)} onAuth={setUser} />
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="h3" align="center" gutterBottom>
-          Power BI Clone
-        </Typography>
-        {user && <Typography variant="subtitle1" align="center">Welcome, {user?.username}</Typography>}
-        {user && <CashTracker user={user} />}
-        <DataUploadPage />
-        <AdminPage />
-        <DashboardBuilder />
-      </Box>
-      <Box component="footer" sx={{ textAlign: 'center', py: 2, mt: 4, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-        <Typography variant="body2" color="textSecondary">
-          Created by Faisal Aldosari
-        </Typography>
-      </Box>
-    </Container>
-  )
+    <>
+      <AuthPopup open={authOpen} onAuth={setUser} />
+      <Typography variant="h3" align="center" gutterBottom>
+        Youssef BI
+      </Typography>
+      {user && <Typography variant="subtitle1" align="center">Welcome, {user?.username}</Typography>}
+      <DashboardBuilder />
+    </>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <FinanceDataProvider>
+      <Router>
+        <Container maxWidth="md" sx={{ blockSize: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2 }}>
+          <Navigation />
+          <Box sx={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/actuals" element={<ActualsInput />} />
+              <Route path="/departments" element={<DepartmentInput />} />
+              <Route path="/budget" element={<BudgetInput />} />
+              <Route path="/cash" element={<CashInInput />} />
+              <Route path="/reports" element={<ReportPage />} />
+            </Routes>
+          </Box>
+          <Box component="footer" sx={{ textAlign: 'center', py: 2, mt: 4, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+            <Typography variant="body2" color="textSecondary">
+              Created by Faisal Aldosari
+            </Typography>
+          </Box>
+        </Container>
+      </Router>
+    </FinanceDataProvider>
+  );
+}
+
+export default App;

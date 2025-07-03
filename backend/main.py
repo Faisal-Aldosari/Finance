@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import tempfile
 from fpdf import FPDF
 import pandas as pd
@@ -16,6 +16,8 @@ from fastapi import Depends, Request
 import uuid
 import os
 from dotenv import load_dotenv
+import smtplib
+from email.message import EmailMessage
 
 app = FastAPI()
 
@@ -34,6 +36,7 @@ EMPLOYEES: Dict[str, dict] = {}
 SESSIONS: List[dict] = []
 UPLOADED_DATA: List[dict] = []
 CASH_TRANSACTIONS = {}
+VERIFIED_USERS = set()
 
 class Department(BaseModel):
     id: str
@@ -256,3 +259,36 @@ def export_cash_summary_pdf(user=Depends(fastapi_users.current_user())):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         pdf.output(tmp.name)
         return FileResponse(tmp.name, filename="summary.pdf", media_type="application/pdf")
+
+@app.post("/auth/request-verify")
+def request_verify(data: dict, background_tasks: BackgroundTasks):
+    email = data.get('email')
+    username = data.get('username')
+    password = data.get('password')
+    if not email or not username or not password:
+        raise HTTPException(status_code=400, detail="Missing fields")
+    # Simulate user creation and send email
+    token = str(uuid.uuid4())
+    # Store token for demo (in production, use DB)
+    VERIFIED_USERS.add(token)
+    # Send email (replace with real SMTP config)
+    def send_email():
+        msg = EmailMessage()
+        msg['Subject'] = 'Verify your email'
+        msg['From'] = 'noreply@youssefbi.com'
+        msg['To'] = email
+        msg.set_content(f'Click to verify: http://localhost:5173/auth/verify?token={token}')
+        try:
+            with smtplib.SMTP('localhost') as s:
+                s.send_message(msg)
+        except Exception as e:
+            print('Email send failed:', e)
+    background_tasks.add_task(send_email)
+    return JSONResponse({"detail": "Verification email sent."}, status_code=status.HTTP_200_OK)
+
+@app.get("/auth/verify")
+def verify_email(token: str):
+    if token in VERIFIED_USERS:
+        VERIFIED_USERS.remove(token)
+        return {"detail": "Email verified."}
+    raise HTTPException(status_code=400, detail="Invalid or expired token")
