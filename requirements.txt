@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+fpdf
+pandas
+openpyxl
+python-jose[cryptography]
+passlib[bcrypt]
+fastapi-users[sqlalchemy2]
+sqlalchemy
+aiofiles
+httpx
+python-dotenv
+fastapi-users-db-sqlalchemy
+pytest
+pytest-watch
