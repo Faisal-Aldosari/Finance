@@ -12,6 +12,21 @@ dist
 dist-ssr
 *.local
 
+# Ignore build and release artifacts
+release/
+dist/
+dist-electron/
+*.dmg
+*.asar
+*.exe
+*.app
+*.pkg
+*.zip
+*.tar.gz
+*.log
+node_modules/
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
