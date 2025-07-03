@@ -14,7 +14,6 @@ export default function AuthPopup({ open, onAuth }: AuthPopupProps) {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
-  const [error, setError] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
 
@@ -54,38 +53,45 @@ export default function AuthPopup({ open, onAuth }: AuthPopupProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, username })
         });
+        
+        const data = await response.json();
+        
         if (response.ok) {
-          // Send verification email
-          await fetch(`${apiUrl}/auth/request-verify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, password })
-          });
-          setVerificationSent(true);
-          setPendingEmail(email);
+          // Registration successful, show success message and switch to login
+          setError('');
+          alert('Registration successful! You can now login with your username or email.');
+          setTab(0); // Switch to login tab
         } else {
-          const data = await response.json();
           setError(data.detail || 'Registration failed');
         }
-      } catch {
-        setError('Failed to register or send verification email.');
+      } catch (err) {
+        console.error('Registration error:', err);
+        setError('Failed to register. Please try again.');
       }
     } else {
-      // Login flow
+      // Login flow - support both username and email
       try {
-        const response = await fetch(`${apiUrl}/auth/jwt/login`, {
+        const response = await fetch(`${apiUrl}/auth/login`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          credentials: 'include',
-          body: new URLSearchParams({ username: email, password })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: email, password })
         });
+        
+        const data = await response.json();
+        
         if (response.ok) {
-          onAuth({ username: username || email });
+          // Store the token if needed
+          if (data.access_token) {
+            localStorage.setItem('auth_token', data.access_token);
+          }
+          onAuth({ username: data.user?.username || data.user?.email || email });
+          setError('');
         } else {
-          setError('Invalid credentials');
+          setError(data.detail || 'Invalid credentials');
         }
-      } catch {
-        setError('Login failed');
+      } catch (err) {
+        console.error('Login error:', err);
+        setError('Login failed. Please try again.');
       }
     }
   };
@@ -112,9 +118,19 @@ export default function AuthPopup({ open, onAuth }: AuthPopupProps) {
             </Tabs>
             {tab === 0 && (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
-                <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} />
+                <TextField 
+                  label="Email or Username" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)}
+                  helperText="You can use your email or username to login"
+                />
                 <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} />
+                <TextField 
+                  label="Username (for registration)" 
+                  value={username} 
+                  onChange={e => setUsername(e.target.value)}
+                  helperText="Only required for registration"
+                />
                 {error && <Typography color="error">{error}</Typography>}
                 <Button variant="contained" onClick={() => handleEmailAuth('login')}>Login</Button>
                 <Button variant="outlined" onClick={() => handleEmailAuth('register')}>Register</Button>
