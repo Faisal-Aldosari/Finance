@@ -89,7 +89,9 @@ class UserCreate(fa_schemas.BaseUserCreate):
 class UserUpdate(fa_schemas.BaseUserUpdate):
     username: str | None
 
-user_db = SQLAlchemyUserDatabase(User, SessionLocal(), User)
+def get_user_db():
+    db = SessionLocal()
+    yield SQLAlchemyUserDatabase(db, User)
 
 cookie_transport = CookieTransport(cookie_name="auth", cookie_max_age=3600)
 
@@ -102,12 +104,7 @@ jwt_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users = FastAPIUsers[
-    User, str
-](
-    user_db,
-    [jwt_backend],
-)
+fastapi_users = FastAPIUsers[User, str](get_user_db, [jwt_backend])
 
 app.include_router(
     fastapi_users.get_auth_router(jwt_backend),
