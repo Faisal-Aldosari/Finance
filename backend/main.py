@@ -35,7 +35,13 @@ PRODUCTION_FRONTEND_URL = os.getenv("PRODUCTION_FRONTEND_URL", "https://your-fro
 # Allow CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, PRODUCTION_FRONTEND_URL, "http://localhost:3000", "http://localhost:5173"],
+    allow_origins=[
+        FRONTEND_URL, 
+        PRODUCTION_FRONTEND_URL, 
+        "http://localhost:3000", 
+        "http://localhost:5173",
+        "https://youssefbi-hqomto624-faisal-aldosaris-projects.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -284,6 +290,12 @@ async def register_user(data: dict, background_tasks: BackgroundTasks):
     if not email or not username or not password:
         raise HTTPException(status_code=400, detail="Missing required fields")
     
+    # Validate email format
+    import re
+    email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+    if not re.match(email_regex, email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+    
     # Check if user already exists using direct database query
     db = SessionLocal()
     try:
@@ -294,30 +306,23 @@ async def register_user(data: dict, background_tasks: BackgroundTasks):
         existing_username = db.query(User).filter(User.username == username).first()
         if existing_username:
             raise HTTPException(status_code=400, detail="Username already taken")
-    finally:
-        db.close()
-    
-    # Create user directly in database
-    from passlib.hash import bcrypt
-    hashed_password = bcrypt.hash(password)
-    
-    # Create user record
-    user_dict = {
-        "email": email,
-        "username": username,
-        "hashed_password": hashed_password,
-        "is_active": True,
-        "is_superuser": False
-    }
-    
-    try:
+        
+        # Create user directly in database
+        from passlib.hash import bcrypt
+        hashed_password = bcrypt.hash(password)
+        
         # Create user using SQLAlchemy
-        user = User(**user_dict)
-        db = SessionLocal()
+        user = User(
+            email=email,
+            username=username,
+            hashed_password=hashed_password,
+            is_active=True,
+            is_superuser=False
+        )
+        
         db.add(user)
         db.commit()
         db.refresh(user)
-        db.close()
         
         # Generate verification token
         token = str(uuid.uuid4())
@@ -348,9 +353,15 @@ async def register_user(data: dict, background_tasks: BackgroundTasks):
             print(f"Failed to queue email task: {e}")
             
         return {"detail": "Registration successful. You can now login with your username or email.", "success": True}
+        
+    except HTTPException:
+        raise
     except Exception as e:
+        db.rollback()
         print(f"Registration error: {e}")
         raise HTTPException(status_code=400, detail=f"Registration failed: {str(e)}")
+    finally:
+        db.close()
 
 @app.post("/auth/login")
 async def login_user(data: dict):
@@ -461,7 +472,8 @@ MICROSOFT_REDIRECT_URI = os.getenv("MICROSOFT_REDIRECT_URI", f"{BACKEND_URL}/aut
 
 google_oauth = GoogleOAuth2(
     client_id=GOOGLE_CLIENT_ID,
-    client_secret=GOOGLE_CLIENT_SECRET
+    client_secret=GOOGLE_CLIENT_SECRET,
+    scopes=["openid", "email", "profile"]
 )
 microsoft_oauth = MicrosoftGraphOAuth2(
     client_id=MICROSOFT_CLIENT_ID,
@@ -478,3 +490,18 @@ app.include_router(
     prefix="/auth/microsoft",
     tags=["auth"],
 )
+
+# OAuth debug endpoint
+@app.get("/auth/google/test")
+async def test_google_oauth():
+    """Test Google OAuth configuration"""
+    try:
+        return {
+            "google_client_id_set": bool(GOOGLE_CLIENT_ID),
+            "google_client_secret_set": bool(GOOGLE_CLIENT_SECRET),
+            "google_redirect_uri": GOOGLE_REDIRECT_URI,
+            "backend_url": BACKEND_URL,
+            "frontend_url": FRONTEND_URL
+        }
+    except Exception as e:
+        return {"error": str(e)}
