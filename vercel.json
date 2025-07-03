@@ -1,6 +1,5 @@
-// vercel.json for frontend deployment
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://YOUR-BACKEND-RENDER-URL/api/$1" }
+    { "source": "/api/(.*)", "destination": "https://finance-g72p.onrender.com/api/$1" }
   ]
 }
