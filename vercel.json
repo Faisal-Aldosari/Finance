@@ -1,0 +1,6 @@
+// vercel.json for frontend deployment
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://YOUR-BACKEND-RENDER-URL/api/$1" }
+  ]
+}
