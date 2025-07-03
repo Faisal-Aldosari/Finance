@@ -81,7 +81,13 @@ function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
       )}
       {type === 'map' && (
         <Box sx={{ blockSize: 300, inlineSize: '100%' }}>
-          <MapContainer center={[24.7136, 46.6753] as [number, number]} zoom={5} style={{ blockSize: '100%', inlineSize: '100%' }}>
+          <MapContainer
+            {...{
+              center: [24.7136, 46.6753],
+              zoom: 5,
+              style: { blockSize: '100%', inlineSize: '100%' }
+            } as any}
+          >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {data.map((row: any, idx: number) => (
               <Marker key={idx} position={[row.lat, row.lng]}>
