@@ -7,7 +7,7 @@ import tempfile
 from fpdf import FPDF
 import pandas as pd
 from fastapi_users import FastAPIUsers, models as fa_models, schemas as fa_schemas
-from fastapi_users.authentication import JWTStrategy, AuthenticationBackend, CookieTransport, OAuth2AuthorizeCallback, OAuth2PasswordBearerWithCookie
+from fastapi_users.authentication import JWTStrategy, AuthenticationBackend, CookieTransport, OAuth2PasswordBearerWithCookie
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy import create_engine, Column, String, Boolean
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
