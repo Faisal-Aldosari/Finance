@@ -17,14 +17,20 @@ const sampleData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-function ChartEditor({ type, data, onEdit }: any) {
+interface ChartEditorProps {
+  type: 'bar' | 'pie' | 'table' | 'map';
+  data: { name: string; value: number; lat?: number; lng?: number }[];
+  onEdit: (type: 'bar' | 'pie' | 'table' | 'map') => void;
+}
+
+function ChartEditor({ type, data, onEdit }: ChartEditorProps) {
   // For demo, just allow type switching
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenu = (e: any) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
   return (
     <Paper sx={{ p: 2, mb: 2, position: 'relative' }}>
-      <IconButton onClick={handleMenu} sx={{ position: 'absolute', top: 8, right: 8 }}><EditIcon /></IconButton>
+      <IconButton onClick={handleMenu} sx={{ position: 'absolute', insetBlockStart: 8, insetInlineEnd: 8 }}><EditIcon /></IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={() => { onEdit('bar'); handleClose(); }}><BarChartIcon sx={{ mr: 1 }} />Bar Chart</MenuItem>
         <MenuItem onClick={() => { onEdit('pie'); handleClose(); }}><PieChartIcon sx={{ mr: 1 }} />Pie Chart</MenuItem>
@@ -55,7 +61,7 @@ function ChartEditor({ type, data, onEdit }: any) {
       )}
       {type === 'table' && (
         <Box>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ inlineSize: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
                 <th>Name</th>
@@ -74,8 +80,8 @@ function ChartEditor({ type, data, onEdit }: any) {
         </Box>
       )}
       {type === 'map' && (
-        <Box sx={{ height: 300, width: '100%' }}>
-          <MapContainer center={[24.7136, 46.6753]} zoom={5} style={{ height: '100%', width: '100%' }}>
+        <Box sx={{ blockSize: 300, inlineSize: '100%' }}>
+          <MapContainer center={[24.7136, 46.6753]} zoom={5} style={{ blockSize: '100%', inlineSize: '100%' }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {data.map((row: any, idx: number) => (
               <Marker key={idx} position={[row.lat, row.lng]}>

@@ -3,7 +3,13 @@ import { Dialog, DialogTitle, DialogContent, Tabs, Tab, Box, TextField, Button, 
 import GoogleIcon from '@mui/icons-material/Google';
 import MicrosoftIcon from '@mui/icons-material/Microsoft';
 
-export default function AuthPopup({ open, onClose, onAuth }: any) {
+interface AuthPopupProps {
+  open: boolean;
+  onClose: () => void;
+  onAuth: (user: { username: string }) => void;
+}
+
+export default function AuthPopup({ open, onClose, onAuth }: AuthPopupProps) {
   const [tab, setTab] = useState(0);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,7 +44,7 @@ export default function AuthPopup({ open, onClose, onAuth }: any) {
           <Tab label="Social" />
         </Tabs>
         {tab === 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 300 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
             <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} />
             <TextField label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
             <TextField label="Username" value={username} onChange={e => setUsername(e.target.value)} />
@@ -48,7 +54,7 @@ export default function AuthPopup({ open, onClose, onAuth }: any) {
           </Box>
         )}
         {tab === 1 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 300 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minInlineSize: 300 }}>
             <Button variant="contained" startIcon={<GoogleIcon />} onClick={() => handleSocial('google')}>Sign in with Google</Button>
             <Button variant="contained" startIcon={<MicrosoftIcon />} onClick={() => handleSocial('microsoft')}>Sign in with Microsoft</Button>
           </Box>

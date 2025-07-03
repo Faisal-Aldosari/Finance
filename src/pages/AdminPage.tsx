@@ -1,13 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Button, Paper, TextField, Grid, Divider } from '@mui/material';
+import { Box, Typography, Button, Paper, TextField, Divider } from '@mui/material';
 import axios from 'axios';
-import jsPDF from 'jspdf';
+
+// Types for departments, employees, and session aggregates
+interface Department {
+  id: string;
+  name: string;
+}
+interface Employee {
+  id: string;
+  name: string;
+  department_id: string;
+}
+interface SessionAgg {
+  [employeeId: string]: { expected: number; actual: number };
+}
 
 export default function AdminPage() {
-  const [departments, setDepartments] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [sessions, setSessions] = useState([]);
-  const [agg, setAgg] = useState({});
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [agg, setAgg] = useState<SessionAgg>({});
   const [deptName, setDeptName] = useState('');
   const [empName, setEmpName] = useState('');
   const [empDept, setEmpDept] = useState('');
@@ -50,13 +62,7 @@ export default function AdminPage() {
   };
 
   const exportPDF = async () => {
-    // Option 1: Download from backend
     window.open('/export/pdf', '_blank');
-    // Option 2: Custom frontend PDF (example below)
-    // const doc = new jsPDF();
-    // doc.text('Departments', 10, 10);
-    // departments.forEach((d, i) => doc.text(`${d.id}: ${d.name}`, 10, 20 + i * 10));
-    // doc.save('report.pdf');
   };
 
   return (
@@ -83,15 +89,15 @@ export default function AdminPage() {
       <Divider sx={{ my: 2 }} />
       <Typography variant="h6">Departments</Typography>
       <ul>
-        {departments.map((d: any) => <li key={d.id}>{d.id}: {d.name}</li>)}
+        {departments.map((d) => <li key={d.id}>{d.id}: {d.name}</li>)}
       </ul>
       <Typography variant="h6">Employees</Typography>
       <ul>
-        {employees.map((e: any) => <li key={e.id}>{e.id}: {e.name} (Dept: {e.department_id})</li>)}
+        {employees.map((e) => <li key={e.id}>{e.id}: {e.name} (Dept: {e.department_id})</li>)}
       </ul>
       <Typography variant="h6">Session Aggregates</Typography>
       <ul>
-        {Object.entries(agg).map(([eid, data]: any) => <li key={eid}>Employee {eid}: Expected {data.expected}, Actual {data.actual}</li>)}
+        {Object.entries(agg).map(([eid, data]) => <li key={eid}>Employee {eid}: Expected {data.expected}, Actual {data.actual}</li>)}
       </ul>
       <Button variant="outlined" onClick={exportPDF} sx={{ mt: 2 }}>Export PDF</Button>
     </Box>

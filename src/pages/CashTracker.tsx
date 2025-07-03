@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Button, TextField, Grid } from '@mui/material';
 import axios from 'axios';
 
-export default function CashTracker({ user }: { user: any }) {
+interface CashTrackerProps {
+  user: { username: string };
+}
+
+export default function CashTracker({ user }: CashTrackerProps) {
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('in');
   const [desc, setDesc] = useState('');

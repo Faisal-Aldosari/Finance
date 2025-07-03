@@ -9,16 +9,16 @@ import './App.css'
 
 function App() {
   const [authOpen, setAuthOpen] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<{ username: string } | null>(null)
 
   return (
-    <Container maxWidth="md" sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2 }}>
+    <Container maxWidth="md" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2 }}>
       <AuthPopup open={authOpen} onClose={() => setAuthOpen(false)} onAuth={setUser} />
       <Box sx={{ flex: 1 }}>
         <Typography variant="h3" align="center" gutterBottom>
           Power BI Clone
         </Typography>
-        {user && <Typography variant="subtitle1" align="center">Welcome, {user.username}</Typography>}
+        {user && <Typography variant="subtitle1" align="center">Welcome, {user?.username}</Typography>}
         {user && <CashTracker user={user} />}
         <DataUploadPage />
         <AdminPage />
